@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { loadUser } from './store/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUser, fetchIpAndLocation } from './store/slices/authSlice';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -13,10 +13,17 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector(state => state.auth);
 
   useEffect(() => {
     dispatch(loadUser());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchIpAndLocation());
+    }
+  }, [isAuthenticated, dispatch]);
 
   return (
     <div className="min-h-screen text-white animated-gradient">

@@ -1,5 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/api';
+import axios from 'axios';
+
+export const fetchIpAndLocation = createAsyncThunk('auth/fetchIpAndLocation', async (_, { rejectWithValue }) => {
+    try {
+        // 1. Fetch IP Address
+        const ipRes = await axios.get('https://api.ipify.org?format=json');
+        const ip = ipRes.data.ip;
+
+        // 2. Fetch Geolocation Data
+        const apiKey = import.meta.env.VITE_GEO_API_KEY;
+        if (!apiKey) {
+            console.warn('VITE_GEO_API_KEY is missing. Skipping geolocation fetch.');
+            return { ip, location: null };
+        }
+
+        const geoRes = await axios.get(`https://geo.ipify.org/api/v2/country,city?apiKey=${apiKey}&ipAddress=${ip}`);
+        return { ip, location: geoRes.data.location };
+    } catch (err) {
+        console.error('Error fetching location:', err);
+        return rejectWithValue(err.message);
+    }
+});
 
 export const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue }) => {
     try {
@@ -35,7 +57,9 @@ const initialState = {
     isAuthenticated: null,
     loading: true,
     user: null,
-    error: null
+    error: null,
+    ip: null,
+    location: null
 };
 
 const authSlice = createSlice({
@@ -48,6 +72,8 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.loading = false;
             state.user = null;
+            state.ip = null;
+            state.location = null;
         },
         clearErrors: (state) => {
             state.error = null;
@@ -55,6 +81,11 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchIpAndLocation.fulfilled, (state, action) => {
+                state.ip = action.payload.ip;
+                state.location = action.payload.location;
+            })
+            // ... existing reducers ...
             .addCase(loadUser.pending, (state) => {
                 state.loading = true;
             })

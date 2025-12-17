@@ -5,7 +5,7 @@ import { Film, LogOut, User, Search, List, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
-    const { isAuthenticated, user } = useSelector(state => state.auth);
+    const { isAuthenticated, user, ip, location: userLocation } = useSelector(state => state.auth);
     const dispatch = useDispatch();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,6 +63,19 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center space-x-4">
                         {isAuthenticated ? (
                             <div className="flex items-center space-x-4">
+                                {/* Location Info - Only show if data exists */}
+                                {(ip || userLocation) && (
+                                    <div className="hidden lg:flex flex-col items-end text-xs text-gray-400 mr-2">
+                                        {userLocation ? (
+                                            <span className="text-indigo-300 font-medium">
+                                                {userLocation.region}, {userLocation.country}
+                                            </span>
+                                        ) : (
+                                            <span>Loading Loc...</span>
+                                        )}
+                                        <span>IP: {ip || '...'}</span>
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
                                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                                         <User className="w-4 h-4 text-white" />
@@ -71,6 +84,7 @@ const Navbar = () => {
                                         {user?.username}
                                     </span>
                                 </div>
+
                                 <button
                                     onClick={() => dispatch(logout())}
                                     className="p-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"

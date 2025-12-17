@@ -115,9 +115,12 @@ const Home = () => {
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl fade-in">
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 badge mb-6">
-                            <Sparkles className="w-4 h-4 text-indigo-400" />
-                            <span className="text-indigo-300">Trending Now</span>
+                        <div className="flex flex-wrap items-center gap-4 mb-6">
+                            <div className="inline-flex items-center gap-2 badge">
+                                <Sparkles className="w-4 h-4 text-indigo-400" />
+                                <span className="text-indigo-300">Trending Now</span>
+                            </div>
+
                         </div>
 
                         {/* Title */}
